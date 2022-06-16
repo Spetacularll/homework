@@ -1,0 +1,193 @@
+#pragma warning(disable : 4996)
+#include "stdio.h"
+#include "stdlib.h"
+#include <iostream>
+#include<vector>
+#include<cstring>
+#include<algorithm>
+#include<map>
+#include<queue>
+using namespace std;
+typedef int elementype;
+
+
+int n;
+typedef struct bstnode
+{
+    elementype data;
+    struct bstnode* lchild, *rchild;
+}bstnode, *Bstree;
+bstnode ha[1000];
+Bstree Tree;
+
+
+
+Bstree InsertBST(Bstree &T, elementype e)
+{
+    if (T==NULL) 
+    {
+       /* cout << "Hi" << endl;*/
+        Bstree S = new bstnode; S->data = e; S->lchild = NULL; S->rchild = NULL; T = S; return S; 
+    }
+    else if (e < T->data) return InsertBST(T->lchild, e);
+    else if (e > T->data) return InsertBST(T->rchild, e);
+    }
+    
+
+
+void Creatbstree(Bstree &T)
+{
+    Tree = NULL;
+    int e1;
+    Bstree ptr;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> e1;
+        ptr = InsertBST(T, e1);
+
+        //cout << "Hi" << endl;
+    }
+    
+    
+}
+
+void ltra()
+{
+    Bstree ptr;
+    ptr = Tree; int f[2]{ 0 };
+    queue<bstnode> tq;
+    tq.push(*ptr);
+    while (!tq.empty())
+    {
+        
+        int len = tq.size();
+        for (int i = 1; i <= len; i++)
+        {
+            ptr = &tq.front(); 
+            cout << ptr->data << " ";
+            if (ptr->lchild) tq.push(*ptr->lchild);
+            if (ptr->rchild) tq.push(*ptr->rchild);
+            tq.pop();
+        }
+    }
+
+
+
+
+}
+
+
+
+Bstree Searchbst(Bstree T,elementype k)
+{
+    if (T)
+    {
+        if (T->data == k)
+        {
+            cout << "1" << endl; return T;
+        }
+        if (T->data < k) return Searchbst(T->rchild, k);
+        if (T->data > k) return Searchbst(T->lchild, k);
+    }
+    else {cout << "0" << endl; return NULL;}
+}
+
+
+void pretraverse(Bstree T)
+{
+
+    if (T)
+    {
+        cout << T->data << " ";
+        pretraverse(T->lchild);
+        pretraverse(T->rchild);
+    }
+}
+void intraverse(Bstree T)
+{
+    if (T)
+    {
+        intraverse(T->lchild);
+        cout << T->data << " ";
+        intraverse(T->rchild);
+    }
+}
+void backtraverse(Bstree T)
+{   
+    if (T)
+    {
+        backtraverse(T->lchild);
+        backtraverse(T->rchild);
+        cout << T->data << " ";
+    }
+}
+
+
+int depth(Bstree T)
+{
+    if (!T) return 0;
+    int x, y;
+    x = depth(T->lchild);
+    y = depth(T->rchild);
+    if (x > y) return x + 1;
+    else return y + 1;
+}
+
+
+void exchangelr(Bstree& T)
+{
+    if (T)
+    {
+        exchangelr(T->lchild);
+        exchangelr(T->rchild);
+        auto lp = T->lchild;
+        auto rp = T->rchild;
+        T->lchild = rp;
+        T->rchild = lp;
+
+    }
+}
+
+
+int leaves(Bstree T)
+{
+    int x=0,y=0;
+    if (!T->lchild&&!T->rchild) return 1;
+    if(T->lchild) x=leaves(T->lchild);
+    if(T->rchild) y=leaves(T->rchild);
+    return x + y;
+}
+
+ 
+
+int main()
+{
+    int key;
+    int ine;
+    cin >> n;
+    Creatbstree(Tree);
+    pretraverse(Tree);cout << endl;
+    intraverse(Tree);cout << endl;
+    backtraverse(Tree);cout << endl;
+    cin >> key;
+    Searchbst(Tree, key);
+    cin >> key;
+    Searchbst(Tree, key);
+    cin >> ine;
+    InsertBST(Tree, ine);
+    pretraverse(Tree);cout << endl;
+    intraverse(Tree); cout << endl;
+    backtraverse(Tree); cout << endl;
+    intraverse(Tree); cout << endl;
+    ltra(); cout << endl;
+    exchangelr(Tree);
+    pretraverse(Tree); cout << endl;
+    intraverse(Tree); cout << endl;
+    backtraverse(Tree); cout << endl;
+    exchangelr(Tree);
+    pretraverse(Tree); cout << endl;
+    intraverse(Tree); cout << endl;
+    backtraverse(Tree); cout << endl;
+    cout<<depth(Tree); cout << endl;
+    cout << leaves(Tree); cout << endl;
+}
