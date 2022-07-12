@@ -1,193 +1,139 @@
-#pragma warning(disable : 4996)
-#include "stdio.h"
-#include "stdlib.h"
-#include <iostream>
-#include<vector>
-#include<cstring>
-#include<algorithm>
-#include<map>
-#include<queue>
+#include<cstdio>
+#include<cstdlib>
+#include<iostream>
+#include<stack>
+
+
 using namespace std;
-typedef int elementype;
 
 
-int n;
-typedef struct bstnode
-{
-    elementype data;
-    struct bstnode* lchild, *rchild;
-}bstnode, *Bstree;
-bstnode ha[1000];
-Bstree Tree;
-
-
-
-Bstree InsertBST(Bstree &T, elementype e)
-{
-    if (T==NULL) 
-    {
-       /* cout << "Hi" << endl;*/
-        Bstree S = new bstnode; S->data = e; S->lchild = NULL; S->rchild = NULL; T = S; return S; 
-    }
-    else if (e < T->data) return InsertBST(T->lchild, e);
-    else if (e > T->data) return InsertBST(T->rchild, e);
-    }
+struct Point {
+    int row, col;
     
-
-
-void Creatbstree(Bstree &T)
-{
-    Tree = NULL;
-    int e1;
-    Bstree ptr;
-    for (int i = 0; i < n; i++)
-    {
-        cin >> e1;
-        ptr = InsertBST(T, e1);
-
-        //cout << "Hi" << endl;
+    bool operator!=(const Point& rhs) {
+        if (this->row != rhs.row || this->col != rhs.col)
+            return true;
+        return false;
     }
-    
-    
-}
 
-void ltra()
+};
+
+
+int maze[4][5]{
+{0,1,0,0,0},
+{0,0,1,1,1},
+{1,0,1,0,0},
+{0,0,0,0,0}
+};
+
+
+
+Point getunvisitAdjacentnode(bool** mark, Point point, int m, int n)
 {
-    Bstree ptr;
-    ptr = Tree; int f[2]{ 0 };
-    queue<bstnode> tq;
-    tq.push(*ptr);
-    while (!tq.empty())
-    {
+    Point resP; resP.col = -1; resP.row = -1;
+    if (point.row - 1 >= 0&& mark[point.row - 1][point.col] == 0) {
+    
+           resP.row = point.row - 1;
+           resP.col = point.col;
+           return  resP;
         
-        int len = tq.size();
-        for (int i = 1; i <= len; i++)
+    }
+    if (point.col + 1 < n&& mark[point.row][point.col + 1] == 0)
+    {
+      
+            resP.row = point.row;
+            resP.col = point.col + 1;
+            return resP;
+        
+    }
+    if (point.col -1 > 0&&mark[point.row][point.col - 1] == 0)
+    {
+            resP.row = point.row;
+            resP.col = point.col - 1;
+            return resP;
+    
+    }
+    if (point.row +1 < m&&mark[point.row + 1][point.col] == 0) {
+        
+        
+            resP.row = point.row + 1;
+            resP.col = point.col;
+            return resP;
+        
+    }
+
+
+
+
+}
+
+
+
+void mazePath(void* maze, int m, int n, const Point& startP, Point& endP, stack<Point>& pointStack)
+{
+    int** maze2d = new int* [m];
+    for (int i = 0; i < m; i++)
+    {
+        maze2d[i] = (int*)maze + i * n;//copy the maze.
+    }
+    if (maze2d[startP.row][startP.col] == 1 || maze2d[endP.row][endP.col] == 1)
+    {
+        return;
+    }
+    bool** mark = new bool* [m];
+    for (int i = 0; i < m; i++)
+        mark[i] = new bool[n];
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
         {
-            ptr = &tq.front(); 
-            cout << ptr->data << " ";
-            if (ptr->lchild) tq.push(*ptr->lchild);
-            if (ptr->rchild) tq.push(*ptr->rchild);
-            tq.pop();
+            mark[i][j] = *((int*)maze + i * n + j);
         }
+    
     }
 
+    //stackpush:startpoint
+    pointStack.push(startP);
+    mark[startP.row][startP.col]= true;
 
-
-
-}
-
-
-
-Bstree Searchbst(Bstree T,elementype k)
-{
-    if (T)
+    while (pointStack.empty()==false&&pointStack.top()!=endP)
     {
-        if (T->data == k)
+        Point adjacentunvisitnode = getunvisitAdjacentnode(mark, pointStack.top(), m, n);
+        if(adjacentunvisitnode.row==-1)
         {
-            cout << "1" << endl; return T;
+            pointStack.pop(); continue;//goback 
         }
-        if (T->data < k) return Searchbst(T->rchild, k);
-        if (T->data > k) return Searchbst(T->lchild, k);
+        mark[adjacentunvisitnode.row][adjacentunvisitnode.col] = true;
+        pointStack.push(adjacentunvisitnode);
     }
-    else {cout << "0" << endl; return NULL;}
+
 }
 
 
-void pretraverse(Bstree T)
-{
 
-    if (T)
-    {
-        cout << T->data << " ";
-        pretraverse(T->lchild);
-        pretraverse(T->rchild);
-    }
-}
-void intraverse(Bstree T)
-{
-    if (T)
-    {
-        intraverse(T->lchild);
-        cout << T->data << " ";
-        intraverse(T->rchild);
-    }
-}
-void backtraverse(Bstree T)
-{   
-    if (T)
-    {
-        backtraverse(T->lchild);
-        backtraverse(T->rchild);
-        cout << T->data << " ";
-    }
-}
-
-
-int depth(Bstree T)
-{
-    if (!T) return 0;
-    int x, y;
-    x = depth(T->lchild);
-    y = depth(T->rchild);
-    if (x > y) return x + 1;
-    else return y + 1;
-}
-
-
-void exchangelr(Bstree& T)
-{
-    if (T)
-    {
-        exchangelr(T->lchild);
-        exchangelr(T->rchild);
-        auto lp = T->lchild;
-        auto rp = T->rchild;
-        T->lchild = rp;
-        T->rchild = lp;
-
-    }
-}
-
-
-int leaves(Bstree T)
-{
-    int x=0,y=0;
-    if (!T->lchild&&!T->rchild) return 1;
-    if(T->lchild) x=leaves(T->lchild);
-    if(T->rchild) y=leaves(T->rchild);
-    return x + y;
-}
-
- 
 
 int main()
 {
-    int key;
-    int ine;
-    cin >> n;
-    Creatbstree(Tree);
-    pretraverse(Tree);cout << endl;
-    intraverse(Tree);cout << endl;
-    backtraverse(Tree);cout << endl;
-    cin >> key;
-    Searchbst(Tree, key);
-    cin >> key;
-    Searchbst(Tree, key);
-    cin >> ine;
-    InsertBST(Tree, ine);
-    pretraverse(Tree);cout << endl;
-    intraverse(Tree); cout << endl;
-    backtraverse(Tree); cout << endl;
-    intraverse(Tree); cout << endl;
-    ltra(); cout << endl;
-    exchangelr(Tree);
-    pretraverse(Tree); cout << endl;
-    intraverse(Tree); cout << endl;
-    backtraverse(Tree); cout << endl;
-    exchangelr(Tree);
-    pretraverse(Tree); cout << endl;
-    intraverse(Tree); cout << endl;
-    backtraverse(Tree); cout << endl;
-    cout<<depth(Tree); cout << endl;
-    cout << leaves(Tree); cout << endl;
+    Point startP; startP.row = 0; startP.col = 0;
+    Point endP;
+    endP.row = 3; endP.col = 4;
+    stack<Point> pointStack;
+    mazePath(maze, 4, 5, startP, endP, pointStack);
+    if (pointStack.empty() == true) {
+        cout << "no right path" << endl;
+    }
+    else {
+        stack<Point> tmpStack;
+        cout << "path:";
+        while (pointStack.empty()==false)
+        {
+            tmpStack.push(pointStack.top());
+            pointStack.pop();
+        }
+        while (!tmpStack.empty())
+        {
+            printf("(%d,%d)", tmpStack.top().row, tmpStack.top().col);
+            tmpStack.pop();
+        }
+    }
 }
